@@ -125,6 +125,7 @@ app.get("/", (req, res) => {
           <input id="msg" placeholder="Say something" />
           <button onclick="send()">Send</button>
           <button id="resetBtn" onclick="resetChat()">戻る</button>
+          <button id="envBtn" onclick="showEnv()">Env</button>
         </div>
 
         <script>
@@ -137,6 +138,14 @@ app.get("/", (req, res) => {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ message: msg })
             });
+            async function showEnv() {
+              const res = await fetch('/env');
+              const data = await res.json();
+              
+              const chatDiv = document.getElementById('chat');
+              chatDiv.innerHTML += "<p><b>Env:</b></p><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+              chatDiv.scrollTop = chatDiv.scrollHeight;
+            }
             const data = await res.json();
             const chatDiv = document.getElementById('chat');
             chatDiv.innerHTML += '<p><b>You:</b> '+msg+'</p>';
