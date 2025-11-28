@@ -57,7 +57,7 @@ app.post("/chat", async (req, res) => {
     });
 
     const data = await response.json();
-    const reply = data
+    const reply = data;
 
     // --- 応答返却 ---
     return res.json({ message: reply });
