@@ -46,11 +46,12 @@ app.post("/chat", async (req, res) => {
         "Authorization": `Bearer ${token}`
       },
    body: JSON.stringify({
-     messages: [
-     {
-       role: "assistant",
-       content: userInput
-    }
+      stream: false,
+      messages: [
+      {
+        role: "assistant",
+        content: userInput
+     }
   ]
 })
     });
