@@ -49,7 +49,7 @@ app.post("/chat", async (req, res) => {
       stream: false,
       messages: [
       {
-        role: "assistant",
+        role: "user",
         content: userInput
      }
   ]
