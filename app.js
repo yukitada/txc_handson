@@ -39,13 +39,14 @@ app.post("/chat", async (req, res) => {
     }
 
     // --- watsonx Orchestrate API呼び出し ---
-    const response = await fetch(`${WXO_URL}/v1/orchestrate/runs`, {
+    const response = await fetch(`${WXO_URL}/v1/orchestrate/c5b90b62-62c9-4f5a-8b5c-6581954a68e8/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
-      body: '{"message":userInput}'
+      body: '{"messages":[{"role":"assistant","content":userInput}]'
+body: '{"message":userInput}'
     });
 
     const data = await response.text();
