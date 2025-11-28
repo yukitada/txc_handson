@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIチャットデモ</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 30px; }
+    #chat { width: 100%; max-width: 600px; margin: auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .msg { margin-bottom: 10px; }
+    .user { text-align: right; color: #333; }
+    .bot { text-align: left; color: #0072C3; }
+  </style>
+</head>
+<body>
+  <div id="chat">
+    <div id="messages"></div>
+    <input id="input" type="text" placeholder="メッセージを入力..." style="width:80%">
+    <button id="send">送信</button>
+  </div>
+
+  <script>
+    const input = document.getElementById("input");
+    const send = document.getElementById("send");
+    const messages = document.getElementById("messages");
+
+    send.onclick = async () => {
+      const msg = input.value.trim();
+      if (!msg) return;
+      appendMessage("user", msg);
+      input.value = "";
+
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg }),
+      });
+      const data = await res.json();
+      appendMessage("bot", data.reply);
+    };
+
+    function appendMessage(role, text) {
+      const div = document.createElement("div");
+      div.className = `msg ${role}`;
+      div.innerText = (role === "user" ? "👤 " : "🤖 ") + text;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+  </script>
+</body>
+</html>
