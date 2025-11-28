@@ -39,7 +39,7 @@ app.post("/chat", async (req, res) => {
     }
 
     // --- watsonx Orchestrate API呼び出し ---
-    const response = await fetch(`${WXO_URL}/messages`, {
+    const response = await fetch(`${WXO_URL}/v1/orchestrate/runs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
