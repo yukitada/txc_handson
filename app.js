@@ -29,28 +29,35 @@ app.post("/chat", async (req, res) => {
   if (!userInput) return res.status(400).json({ error: "message is required" });
 
   try {
-    // TechZone 制限下ではモックで応答
-    let reply = "Oops! Looks like I don't have enough info to answer that. Can you tell me a bit more?";
-    
-    // 実際に連携可能な場合は以下を有効化
-    /*
+    // --- IAMトークン生成 ---
     const token = await getIAMToken(WXO_API_KEY);
+
+    if (!token) {
+      return res.status(500).json({ error: "IAM Token could not be generated" });
+    }
+
+    // --- watsonx Orchestrate API呼び出し ---
     const response = await fetch(`${WXO_URL}/messages`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify({ input: { text: userInput } })
+      body: JSON.stringify({
+        input: { text: userInput }
+      })
     });
-    const data = await response.json();
-    reply = data.output?.generic?.[0]?.text || "No response from WXO";
-    */
 
-    res.json({ message: reply });
+    const data = await response.json();
+
+    const reply = data.output?.generic?.[0]?.text || "No response from WXO";
+
+    // --- 応答返却 ---
+    return res.json({ message: reply });
+
   } catch (err) {
     console.error("WXO call failed:", err);
-    res.status(500).json({ error: "Failed to get response from Watsonx Orchestrate" });
+    return res.status(500).json({ error: "Failed to get response from Watsonx Orchestrate" });
   }
 });
 
