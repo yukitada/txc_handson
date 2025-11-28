@@ -19,6 +19,8 @@
     <button id="send">送信</button>
   </div>
 
+<button id="envBtn" onclick="showEnv()">Env</button>
+
   <script>
     const input = document.getElementById("input");
     const send = document.getElementById("send");
@@ -46,6 +48,16 @@
       messages.appendChild(div);
       messages.scrollTop = messages.scrollHeight;
     }
+
+    async function showEnv() {
+      const res = await fetch('/env');
+      const data = await res.json();
+      
+      const chatDiv = document.getElementById('chat');
+      chatDiv.innerHTML += "<p><b>Env:</b></p><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+
   </script>
 </body>
 </html>
