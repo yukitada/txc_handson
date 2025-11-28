@@ -48,7 +48,7 @@ app.post("/chat", async (req, res) => {
       body: '{"messages":[{"role":"assistant","content":userInput}]'
     });
 
-    const data = await response.json();
+    const data = await response.text();
 
     const reply = data
 
