@@ -7,9 +7,9 @@ app.use(bodyParser.json());
 
 // 環境変数から取得（TechZone 用に WXO 連携はモック可）
 const WXO_URL = process.env.WXO_URL || "";
-const WXO_API_KEY = process.env.WXO_APIKEY || "";
+const WXO_API_KEY = process.env.WXO_API_KEY || "";
 console.log(process.env.WXO_URL);
-console.log(process.env.WXO_APIKEY);
+console.log(process.env.WXO_API_KEY);
 
 // IAMトークン生成（実際に連携する場合のみ）
 async function getIAMToken(apiKey) {
