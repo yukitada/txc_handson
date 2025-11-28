@@ -45,7 +45,14 @@ app.post("/chat", async (req, res) => {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
-      body: '{"messages":[{"role":"assistant","content":userInput}]'
+   body: JSON.stringify({
+     messages: [
+     {
+       role: "assistant",
+       content: userInput
+    }
+  ]
+})
     });
 
     const data = await response.text();
