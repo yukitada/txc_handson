@@ -45,13 +45,13 @@ app.post("/chat", async (req, res) => {
     });
     const data = await response.json();
     reply = data.output?.generic?.[0]?.text || "No response from WXO";
+    */
 
     res.json({ message: reply });
   } catch (err) {
     console.error("WXO call failed:", err);
     res.status(500).json({ error: "Failed to get response from Watsonx Orchestrate" });
   }
-  */
 });
 
 // シンプルUI + デザイン改善 + Bot回答青色
