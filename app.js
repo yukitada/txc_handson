@@ -50,9 +50,9 @@ app.post("/chat", async (req, res) => {
       })
     });
 
-    const data = await response.json();
+    const data = await response.text();
 
-    const reply = data.output?.generic?.[0]?.text || "No response from WXO";
+    const reply = data
 
     // --- 応答返却 ---
     return res.json({ message: reply });
