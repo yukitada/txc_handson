@@ -138,14 +138,6 @@ app.get("/", (req, res) => {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ message: msg })
             });
-            async function showEnv() {
-              const res = await fetch('/env');
-              const data = await res.json();
-              
-              const chatDiv = document.getElementById('chat');
-              chatDiv.innerHTML += "<p><b>Env:</b></p><pre>" + JSON.stringify(data, null, 2) + "</pre>";
-              chatDiv.scrollTop = chatDiv.scrollHeight;
-            }
             const data = await res.json();
             const chatDiv = document.getElementById('chat');
             chatDiv.innerHTML += '<p><b>You:</b> '+msg+'</p>';
@@ -153,6 +145,15 @@ app.get("/", (req, res) => {
             chatDiv.innerHTML += '<p><b>Bot:</b> <span style="color:blue;">'+(data.message||data.error)+'</span></p>';
             chatDiv.scrollTop = chatDiv.scrollHeight;
             msgInput.value = '';
+          }
+
+          async function showEnv() {
+            const res = await fetch('/env');
+            const data = await res.json();
+            
+            const chatDiv = document.getElementById('chat');
+            chatDiv.innerHTML += "<p><b>Env:</b></p><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+            chatDiv.scrollTop = chatDiv.scrollHeight;
           }
 
           function resetChat() {
