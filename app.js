@@ -2,14 +2,16 @@ import express from "express";
 import bodyParser from "body-parser";
 import fetch from "node-fetch";
 
+console.log(process.env)
+
 const app = express();
 app.use(bodyParser.json());
 
 // 環境変数から取得（TechZone 用に WXO 連携はモック可）
-const WXO_URL = process.env.WXO_URL || "";
-const WXO_API_KEY = process.env.WXO_API_KEY || "";
-console.log(process.env.WXO_URL);
-console.log(process.env.WXO_API_KEY);
+const WXO_URL = process.env.WATSONX_ORCHESTRATE_URL || "";
+const WXO_APIKEY = process.env.WATSONX_ORCHESTRATE_APIKEY || "";
+console.log(process.env.WATSONX_ORCHESTRATE_URL);
+console.log(process.env.WATSONX_ORCHESTRATE_APIKEY);
 
 // IAMトークン生成（実際に連携する場合のみ）
 async function getIAMToken(apiKey) {
@@ -30,7 +32,7 @@ app.post("/chat", async (req, res) => {
 
   try {
     // --- IAMトークン生成 ---
-    const token = await getIAMToken(WXO_API_KEY);
+    const token = await getIAMToken(WXO_APIKEY);
 
     if (!token) {
       return res.status(500).json({ error: "IAM Token could not be generated" });
