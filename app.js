@@ -57,7 +57,7 @@ app.post("/chat", async (req, res) => {
     });
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "No response from WXO";
+    const reply = data
 
     // --- 応答返却 ---
     return res.json({ message: reply });
