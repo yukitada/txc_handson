@@ -33,7 +33,7 @@ app.post("/chat", async (req, res) => {
     let reply = "Oops! Looks like I don't have enough info to answer that. Can you tell me a bit more?";
     
     // 実際に連携可能な場合は以下を有効化
-    
+    /*
     const token = await getIAMToken(WXO_API_KEY);
     const response = await fetch(`${WXO_URL}/messages`, {
       method: "POST",
@@ -51,6 +51,7 @@ app.post("/chat", async (req, res) => {
     console.error("WXO call failed:", err);
     res.status(500).json({ error: "Failed to get response from Watsonx Orchestrate" });
   }
+  */
 });
 
 // シンプルUI + デザイン改善 + Bot回答青色
