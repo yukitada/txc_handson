@@ -11,10 +11,11 @@ app.use(bodyParser.json());
 const WXO_URL = process.env.WATSONX_ORCHESTRATE_URL || "";
 const WXO_APIKEY = process.env.WATSONX_ORCHESTRATE_APIKEY || "";
 
+let AGENT_ID = null;
 
 // IAMトークン生成
 async function getIAMToken(apiKey) {
-  if (!apiKey) return null; // モック用
+  if (!apiKey) return null;
   const res = await fetch("https://iam.cloud.ibm.com/identity/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -167,6 +168,7 @@ app.get("/", (req, res) => {
           <button onclick="send()">Send</button>
           <button id="resetBtn" onclick="resetChat()">戻る</button>
           <button id="envBtn" onclick="showEnv()">Env</button>
+         <button id="agentBtn" onclick="showAgent()">Agent</button>
         </div>
 
         <script>
@@ -197,6 +199,15 @@ app.get("/", (req, res) => {
             chatDiv.scrollTop = chatDiv.scrollHeight;
           }
 
+          async function showAgent() {
+           const res = await fetch('/agent');
+           const data = await res.json();
+           
+           const chatDiv = document.getElementById('chat');
+           chatDiv.innerHTML += "<p><b>AGENT_ID:</b></p><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+           chatDiv.scrollTop = chatDiv.scrollHeight;
+         }
+
           function resetChat() {
             document.getElementById('chat').innerHTML = '';
             document.getElementById('msg').value = '';
@@ -219,13 +230,17 @@ const port = process.env.PORT || 8080;
   }
 })();
 
+app.listen(port, () => console.log(`Listening on port ${port}`));
+
 // 環境変数を返す
 app.get("/env", (req, res) => {
   res.json(process.env);
 });
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
-
+// AGENT_ID を返す
+app.get("/agent", (req, res) => {
+  res.json({ AGENT_ID });
+});
 
 
 
