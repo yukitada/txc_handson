@@ -35,19 +35,31 @@ async function loadAgentId(token) {
       }
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    console.log("=== RAW Agent API ===");
+    console.log(text);
 
-    if (!data?.agents) {
-      console.error("Agent list format unexpected:", data);
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch (e) {
+      console.error("JSON Parse Error:", e);
       return;
     }
 
+    // 配列処理
+    if (!Array.isArray(json)) {
+      console.error("Agent API response is not an array!", json);
+      return;
+    }
+
+    // name or display_name が "AskHR" のものを探す
     const askHrAgent = json.find(a =>
       a.name === "AskHR" || a.display_name === "AskHR"
     );
 
     if (!askHrAgent) {
-      console.error("AskHR agent not found in agent list.");
+      console.error("AskHR agent not found.");
       return;
     }
 
@@ -58,7 +70,6 @@ async function loadAgentId(token) {
     console.error("Failed to load agent list:", err);
   }
 }
-
 
 // /chat エンドポイント
 app.post("/chat", async (req, res) => {
