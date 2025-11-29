@@ -42,7 +42,9 @@ async function loadAgentId(token) {
       return;
     }
 
-    const askHrAgent = data.agents.find(a => a.name === "AskHR");
+    const askHrAgent = json.find(a =>
+      a.name === "AskHR" || a.display_name === "AskHR"
+    );
 
     if (!askHrAgent) {
       console.error("AskHR agent not found in agent list.");
