@@ -198,7 +198,7 @@ app.get("/", (req, res) => {
             const chatDiv = document.getElementById('chat');
             chatDiv.innerHTML += '<p><b>You:</b> '+msg+'</p>';
             // Botの回答を青色に
-            chatDiv.innerHTML += `<div style="color:blue; white-space:pre-wrap;"><b>Bot:</b> ${data.message || data.error}</div>`;
+            chatDiv.innerHTML += '<p><b>Bot:</b> <span style="color:blue;">'+(data.message||data.error)+'</span></p>';
             chatDiv.scrollTop = chatDiv.scrollHeight;
             msgInput.value = '';
           }
