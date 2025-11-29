@@ -7,13 +7,12 @@ console.log(process.env)
 const app = express();
 app.use(bodyParser.json());
 
-// 環境変数から取得（TechZone 用に WXO 連携はモック可）
+// 環境変数から取得
 const WXO_URL = process.env.WATSONX_ORCHESTRATE_URL || "";
 const WXO_APIKEY = process.env.WATSONX_ORCHESTRATE_APIKEY || "";
-console.log(process.env.WATSONX_ORCHESTRATE_URL);
-console.log(process.env.WATSONX_ORCHESTRATE_APIKEY);
 
-// IAMトークン生成（実際に連携する場合のみ）
+
+// IAMトークン生成
 async function getIAMToken(apiKey) {
   if (!apiKey) return null; // モック用
   const res = await fetch("https://iam.cloud.ibm.com/identity/token", {
@@ -25,10 +24,47 @@ async function getIAMToken(apiKey) {
   return data.access_token;
 }
 
+// Agent一覧から AskHR のエージェントIDを取得
+async function loadAgentId(token) {
+  try {
+    const res = await fetch(`${WXO_URL}/v1/orchestrate/agents`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (!data?.agents) {
+      console.error("Agent list format unexpected:", data);
+      return;
+    }
+
+    const askHrAgent = data.agents.find(a => a.name === "AskHR");
+
+    if (!askHrAgent) {
+      console.error("AskHR agent not found in agent list.");
+      return;
+    }
+
+    AGENT_ID = askHrAgent.id;
+    console.log("✔ Loaded AskHR AGENT_ID:", AGENT_ID);
+
+  } catch (err) {
+    console.error("Failed to load agent list:", err);
+  }
+}
+
+
 // /chat エンドポイント
 app.post("/chat", async (req, res) => {
   const userInput = req.body.message;
   if (!userInput) return res.status(400).json({ error: "message is required" });
+
+if (!AGENT_ID) {
+    return res.status(500).json({ error: "AGENT_ID not loaded yet" });
+  }
 
   try {
     // --- IAMトークン生成 ---
@@ -39,7 +75,7 @@ app.post("/chat", async (req, res) => {
     }
 
     // --- watsonx Orchestrate API呼び出し ---
-    const response = await fetch(`${WXO_URL}/v1/orchestrate/runs`, {
+    const response = await fetch(`${WXO_URL}/v1/orchestrate/${AGENT_ID}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,7 +93,7 @@ app.post("/chat", async (req, res) => {
     });
 
     const data = await response.json();
-    const reply = data;
+    const reply = data.choices?.[0]?.message?.content || "No response from WXO";
 
     // --- 応答返却 ---
     return res.json({ message: reply });
@@ -172,6 +208,17 @@ app.get("/", (req, res) => {
 });
 
 const port = process.env.PORT || 8080;
+
+// --- 起動時にAGENT IDを自動取得 ---
+(async () => {
+  const token = await getIAMToken(WXO_APIKEY);
+  if (token) {
+    await loadAgentId(token);
+  } else {
+    console.error("Failed to get IAM token, cannot load agent ID");
+  }
+})();
+
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
 // 環境変数を返す
