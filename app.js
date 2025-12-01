@@ -11,8 +11,6 @@ app.use(bodyParser.json());
 const WXO_URL = process.env.WATSONX_ORCHESTRATE_URL || "";
 const WXO_APIKEY = process.env.WATSONX_ORCHESTRATE_APIKEY || "";
 
-let AGENT_ID = null;
-
 // IAMトークン生成
 async function getIAMToken(apiKey) {
   if (!apiKey) return null;
@@ -25,8 +23,8 @@ async function getIAMToken(apiKey) {
   return data.access_token;
 }
 
-// Agent一覧から AskHR のエージェントIDを取得
-async function loadAgentId(token) {
+// ユーザーがプルダウンで指定したエージェントIDを取得
+async function loadAgentId(token, agentName) {
   try {
     const res = await fetch(`${WXO_URL}/v1/orchestrate/agents`, {
       method: "GET",
@@ -53,18 +51,16 @@ async function loadAgentId(token) {
       return;
     }
 
-    // name or display_name が "AskHR" のものを探す
-    const askHrAgent = json.find(a =>
-      a.name === "AskHR" || a.display_name === "AskHR"
-    );
+    // agent idを検索
+   const agent = json.find(a => a.name === agentName || a.display_name === agentName);    
 
-    if (!askHrAgent) {
-      console.error("AskHR agent not found.");
-      return;
+   if (!agent) {
+      console.error(`Agent not found: ${agentName}`);
+      return null;
     }
 
-    AGENT_ID = askHrAgent.id;
-    console.log("✔ Loaded AskHR AGENT_ID:", AGENT_ID);
+   return agent.id;   
+   console.log("✔ Loaded AGENT_ID:", agent.id);
 
   } catch (err) {
     console.error("Failed to load agent list:", err);
@@ -74,11 +70,10 @@ async function loadAgentId(token) {
 // /chat エンドポイント
 app.post("/chat", async (req, res) => {
   const userInput = req.body.message;
+  const agentName = req.body.agent;
+ 
   if (!userInput) return res.status(400).json({ error: "message is required" });
-
-if (!AGENT_ID) {
-    return res.status(500).json({ error: "AGENT_ID not loaded yet" });
-  }
+  if (!agentName) return res.status(400).json({ error: "agent is required" });
 
   try {
     // --- IAMトークン生成 ---
@@ -88,8 +83,13 @@ if (!AGENT_ID) {
       return res.status(500).json({ error: "IAM Token could not be generated" });
     }
 
+    // Agent ID を取得
+    const agentId = await loadAgentId(token, agentName);
+    if (!agentId) return res.status(500).json({ error: `Agent ID not found for ${agentName}` });
+
+
     // --- watsonx Orchestrate API呼び出し ---
-    const response = await fetch(`${WXO_URL}/v1/orchestrate/${AGENT_ID}/chat/completions`, {
+    const response = await fetch(`${WXO_URL}/v1/orchestrate/${agentId}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -178,8 +178,30 @@ app.get("/", (req, res) => {
           <h2 style="text-align:center;">Chatbot</h2>
           <div id="chat"></div>
           <input id="msg" placeholder="Say something" />
+          <select id="agentSelect">
+            <option value="AskHR1">AskHR1</option>
+            <option value="AskHR2">AskHR2</option>
+            <option value="AskHR3">AskHR3</option>
+            <option value="AskHR4">AskHR4</option>
+            <option value="AskHR5">AskHR5</option>
+            <option value="AskHR6">AskHR6</option>
+            <option value="AskHR7">AskHR7</option>
+            <option value="AskHR8">AskHR8</option>
+            <option value="AskHR9">AskHR9</option>
+            <option value="AskHR10">AskHR10</option>
+            <option value="AskHR11">AskHR11</option>
+            <option value="AskHR12">AskHR12</option>
+            <option value="AskHR13">AskHR13</option>
+            <option value="AskHR14">AskHR14</option>
+            <option value="AskHR15">AskHR15</option>
+            <option value="AskHR16">AskHR16</option>
+            <option value="AskHR17">AskHR17</option>
+            <option value="AskHR18">AskHR18</option>
+            <option value="AskHR19">AskHR19</option>
+            <option value="AskHR20">AskHR20</option>
+          </select>
           <button onclick="send()">Send</button>
-          <button id="resetBtn" onclick="resetChat()">戻る</button>
+          <button id="resetBtn" onclick="resetChat()">Clear</button>
           <button id="envBtn" onclick="showEnv()">Env</button>
          <button id="agentBtn" onclick="showAgent()">Agent</button>
         </div>
@@ -187,12 +209,13 @@ app.get("/", (req, res) => {
         <script>
           async function send() {
             const msgInput = document.getElementById('msg');
+            const agentName = document.getElementById('agentSelect').value;
             const msg = msgInput.value.trim();
             if(!msg) return;
             const res = await fetch('/chat', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ message: msg })
+              body: JSON.stringify({ message: msg, agent: agentName })
             });
             const data = await res.json();
             const chatDiv = document.getElementById('chat');
