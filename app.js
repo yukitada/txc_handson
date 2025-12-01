@@ -2,6 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import fetch from "node-fetch";
 
+let lastAgentId = null;
+
 console.log(process.env)
 
 const app = express();
@@ -59,8 +61,10 @@ async function loadAgentId(token, agentName) {
       return null;
     }
 
-   return agent.id;   
+   lastAgentId = agent.id;
    console.log("✔ Loaded agent.id:", agent.id);
+   return agent.id;   
+   
 
   } catch (err) {
     console.error("Failed to load agent list:", err);
@@ -260,7 +264,7 @@ app.get("/", (req, res) => {
            const data = await res.json();
            
            const chatDiv = document.getElementById('chat');
-           chatDiv.innerHTML += "<p><b>agent.id:</b></p><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+           chatDiv.innerHTML += "<p><b>Agent ID:</b></p><pre>" + JSON.stringify(data, null, 2) + "</pre>";
            chatDiv.scrollTop = chatDiv.scrollHeight;
          }
 
@@ -276,16 +280,6 @@ app.get("/", (req, res) => {
 
 const port = process.env.PORT || 8080;
 
-// --- 起動時にAGENT IDを自動取得 ---
-(async () => {
-  const token = await getIAMToken(WXO_APIKEY);
-  if (token) {
-    await loadAgentId(token);
-  } else {
-    console.error("Failed to get IAM token, cannot load agent ID");
-  }
-})();
-
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
 // 環境変数を返す
@@ -293,9 +287,9 @@ app.get("/env", (req, res) => {
   res.json(process.env);
 });
 
-// agent.id を返す
+// Agent ID を返す
 app.get("/agent", (req, res) => {
-  res.json({ agent.id });
+  res.json({ agentId: lastAgentId });
 });
 
 
