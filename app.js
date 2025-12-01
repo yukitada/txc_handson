@@ -197,7 +197,6 @@ app.get("/", (req, res) => {
         <div id="container">
           <h2 style="text-align:center;">Chatbot</h2>
           <div id="chat"></div>
-          <input id="msg" placeholder="Say something" />
           <select id="agentSelect">
             <option value="AskHR1">AskHR1</option>
             <option value="AskHR2">AskHR2</option>
@@ -220,6 +219,7 @@ app.get("/", (req, res) => {
             <option value="AskHR19">AskHR19</option>
             <option value="AskHR20">AskHR20</option>
           </select>
+          <input id="msg" placeholder="Say something" />
           <button onclick="send()">Send</button>
           <button id="resetBtn" onclick="resetChat()">Clear</button>
           <button id="envBtn" onclick="showEnv()">Env</button>
