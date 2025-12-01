@@ -60,7 +60,7 @@ async function loadAgentId(token, agentName) {
     }
 
    return agent.id;   
-   console.log("✔ Loaded AGENT_ID:", agent.id);
+   console.log("✔ Loaded agent.id:", agent.id);
 
   } catch (err) {
     console.error("Failed to load agent list:", err);
@@ -148,6 +148,26 @@ app.get("/", (req, res) => {
             margin-bottom: 10px;
             border-radius: 5px;
             background-color: #fafafa;
+          }
+          select {
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #007bff;
+            background-color: #e8f0fe;
+            color: #003e7e;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+          }
+          select:hover {
+            background-color: #dbe7ff;
+          }
+
+          select:focus {
+            outline: none;
+            border-color: #0056b3;
+            box-shadow: 0 0 3px rgba(0, 123, 255, 0.7);
           }
           input {
             width: calc(100% - 90px);
@@ -240,7 +260,7 @@ app.get("/", (req, res) => {
            const data = await res.json();
            
            const chatDiv = document.getElementById('chat');
-           chatDiv.innerHTML += "<p><b>AGENT_ID:</b></p><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+           chatDiv.innerHTML += "<p><b>agent.id:</b></p><pre>" + JSON.stringify(data, null, 2) + "</pre>";
            chatDiv.scrollTop = chatDiv.scrollHeight;
          }
 
@@ -273,9 +293,9 @@ app.get("/env", (req, res) => {
   res.json(process.env);
 });
 
-// AGENT_ID を返す
+// agent.id を返す
 app.get("/agent", (req, res) => {
-  res.json({ AGENT_ID });
+  res.json({ agent.id });
 });
 
 
